@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="css/main.css" rel="stylesheet">
+    <script type="text/javascript" src="js/bundle.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <form role="form">
+        <h2>Ethos BIP39 Tool</h2> 
+        <h2>
+            <small>Access your raw private/public key pairs</small>
+        </h2>
+        <div class="alert alert-danger">
+            <strong>DANGER!</strong> Understand that by using this tool you are exposing your seed, and thus your private keys, to a potential attack surface which includes a heightened risk of losing some or all of your funds. Do not use this tool on any untrusted domain and do not assume that this tool is secure even if it is on a trusted domain. We highly recommend that you download the source of this tool, disconnect from the internet, and derive all of the information you need on the safety of an airgapped computer. By using this tool, you acknowledge this risk.
+        </div>
+        <hr class="colorgraph">
+        <div class="row">
+            <div class="col-xs-8 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word0" id="word0" class="form-control input-lg" placeholder="Word 1" tabindex="1">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word1" id="word1" class="form-control input-lg" placeholder="Word 2" tabindex="2">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word2" id="word2" class="form-control input-lg" placeholder="Word 3" tabindex="3">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word3" id="word3" class="form-control input-lg" placeholder="Word 4" tabindex="4">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word4" id="word4" class="form-control input-lg" placeholder="Word 5" tabindex="5">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word5" id="word5" class="form-control input-lg" placeholder="Word 6" tabindex="6">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word6" id="word6" class="form-control input-lg" placeholder="Word 7" tabindex="7">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word7" id="word7" class="form-control input-lg" placeholder="Word 8" tabindex="8">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word8" id="word8" class="form-control input-lg" placeholder="Word 9" tabindex="9">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word9" id="word9" class="form-control input-lg" placeholder="Word 10" tabindex="10">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word10" id="word10" class="form-control input-lg" placeholder="Word 11" tabindex="11">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word11" id="word11" class="form-control input-lg" placeholder="Word 12" tabindex="12">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word12" id="word12" class="form-control input-lg" placeholder="Word 13" tabindex="13">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word13" id="word13" class="form-control input-lg" placeholder="Word 14" tabindex="14">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word14" id="word14" class="form-control input-lg" placeholder="Word 15" tabindex="15">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word15" id="word15" class="form-control input-lg" placeholder="Word 16" tabindex="16">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word16" id="word16" class="form-control input-lg" placeholder="Word 17" tabindex="17">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word17" id="word17" class="form-control input-lg" placeholder="Word 18" tabindex="18">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word18" id="word18" class="form-control input-lg" placeholder="Word 19" tabindex="19">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word19" id="word19" class="form-control input-lg" placeholder="Word 20" tabindex="20">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word20" id="word20" class="form-control input-lg" placeholder="Word 21" tabindex="21">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word21" id="word21" class="form-control input-lg" placeholder="Word 22" tabindex="22">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word22" id="word22" class="form-control input-lg" placeholder="Word 23" tabindex="23">
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <div class="form-group">
+                    <input type="text" name="word23" id="word23" class="form-control input-lg" placeholder="Word 24" tabindex="24">
+                </div>
+            </div>
+        </div>
+        <hr class="colorgraph">
+        <div class="row">
+            <div class="col-xs-12 col-md-12"><a href="#" class="btn btn-success btn-block btn-lg">Derive Addresses</a></div>
+        </div>
+    </form>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  </body>
+</html>

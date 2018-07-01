@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "convert": "browserify prebundle.js -o bundle.js"
+    "convert": "browserify js/prebundle.js -o js/bundle.js",
+    "start": "node server/server.js"
   },
   "author": "Ethos",
   "license": "ISC",
@@ -15,8 +16,10 @@
     "@types/node": "^9.6.1",
     "bip39": "^2.4.0",
     "bitcore-lib": "^0.15.0",
+    "browserify": "^16.2.2",
     "commander": "^2.15.1",
     "ethereumjs-util": "^5.2.0",
+    "express": "^4.16.3",
     "prompt": "^1.0.0",
     "tsc": "^1.20150623.0",
     "tslint": "^5.8.0",

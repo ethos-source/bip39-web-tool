@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const Prompt = require("prompt");
 const Bip39 = require("bip39");
+const program = require("commander");
 const ethUtil = require("ethereumjs-util");
 const bitcore_lib_1 = require("bitcore-lib");
 const ENGLISH_WORDLIST = Bip39.wordlists.EN;
@@ -9,8 +11,8 @@ let MAINNET_MODE = false;
 let NUM_WALLETS = 10;
 let START_WALLET_INDEX = 0;
 const EXTENDED_KEYPAIR_PATH = `m/244'`;
-
-// build the schema to validate the seed format
+Prompt.message = "Mnemonic";
+Prompt.colors = false;
 function buildSeedPromptSchema() {
     let i = 1;
     const schema = Array.from({ length: MNEMONIC_WORDCOUNT }, () => {
@@ -32,7 +34,6 @@ function buildSeedPromptSchema() {
     return schema;
 }
 
-// schema verification
 function promptInputAsPromise(schema) {
     return new Promise((resolve) => {
         Prompt.get(schema, (error, input) => {
@@ -44,8 +45,6 @@ function promptInputAsPromise(schema) {
         });
     });
 }
-
-// format it correctly
 function promptInputToMnemonic(input) {
     const words = [];
     for (let i = 0; i <= MNEMONIC_WORDCOUNT; i++) {
@@ -53,33 +52,15 @@ function promptInputToMnemonic(input) {
     }
     return words.join(' ').trim();
 }
-
-// Extended Private Key
-// Returns string with extended private key
-function getExtendedPrivateKey(seed, xKeyPath) {
-    const xKey = getKeyPair(seed, xKeyPath);
-    const xPrivateKey = xKey.extendedPrivateKey;
-    console.log(`Extended Private Key (at ${xKeyPath}): ${xPrivateKey}`);
-    return {
-        "xKeyPath" : xKeyPath,
-        "xPrivateKey" : xPrivateKey
-    }
+function printDelimiter() {
+    console.log('---------------------------------------');
 }
-
-// Extended Public Key
-// Returns string with extended public key
-function getExtendedPublicKey(seed, xKeyPath) {
+function printExtendedKeys(seed, xKeyPath) {
     const xKey = getKeyPair(seed, xKeyPath);
-    const xPublicKey = xKey.extendedPublicKey;
-    console.log(`Extended Public Key (at ${xKeyPath}): ${xPublicKey}`);
-    return {
-        "xKeyPath" : xKeyPath,
-        "xPublicKey" : xPublicKey
-    }
+    console.log(`Extended Private Key (at ${xKeyPath}): ${xKey.extendedPrivateKey}`);
+    console.log(`Extended Public Key (at ${xKeyPath}): ${xKey.extendedPublicKey}`);
+    console.log('\n');
 }
-
-// returns extendedPrivateKey, extendedPublicKey, privateKey and publicKey
-// also checks for mainnet vs testnet
 function getKeyPair(seed, derivationPath) {
     const hdPrivateKey = bitcore_lib_1.HDPrivateKey.fromSeed(seed, getBlockchainNetwork());
     let extendedPrivateKey = hdPrivateKey.derive(derivationPath);
@@ -94,59 +75,35 @@ function getKeyPair(seed, derivationPath) {
         publicKey,
     };
 }
-
-// returns testnet vs mainnet
 function getBlockchainNetwork() {
     return MAINNET_MODE ? bitcore_lib_1.Networks.livenet : bitcore_lib_1.Networks.testnet;
 }
-
-// constructs the derviation path
 function getDerivationPath(blockchainId, walletIndex, addressIndex) {
     return `${EXTENDED_KEYPAIR_PATH}/0/${blockchainId}/${walletIndex}/0/${addressIndex}`;
 }
-
-// prints out wallets and loops through
-// probably won't be needed
 function printWallets(seed, numWallets) {
     Array.from({ length: NUM_WALLETS }, (v, k) => k).forEach(i => {
         printWalletDetails(seed, 0, START_WALLET_INDEX + i);
         printWalletDetails(seed, 60, START_WALLET_INDEX + i);
+        printDelimiter();
     });
 }
-
-// prints out details relating to the wallet
 function printWalletDetails(seed, blockchainId, walletIndex) {
     const path = getDerivationPath(blockchainId, walletIndex, 0);
     const keyPair = getKeyPair(seed, path);
-    const publicKey = keyPair.publicKey;
-    const privateKey = keyPair.privateKey;
     console.log(`Wallet Index ${walletIndex} (at ${path})`);
-    console.log(`Public Key: ${publicKey}`);
-    console.log(`Private Key: ${privateKey}`);
+    console.log(`Public Key: ${keyPair.publicKey}`);
+    console.log(`Private Key: ${keyPair.privateKey}`);
     switch (blockchainId) {
         case 0:
-            var btcAddress = getBtcAddress(keyPair.privateKey);
-            return {
-                "walletIndex" : walletIndex,
-                "path" : path,
-                "publicKey" : publicKey,
-                "privateKey" : privateKey,
-                "btcAddress" : btcAddress
-            }
+            console.log(`Bitcoin Address: ${getBtcAddress(keyPair.privateKey)}`);
+            break;
         case 60:
-            var ethAddress = getEthAddress(keyPair.privateKey);
-            return {
-                "walletIndex" : walletIndex,
-                "path" : path,
-                "publicKey" : publicKey,
-                "privateKey" : privateKey,
-                "ethAddress" : ethAddress
-            }
+            console.log(`Ethereum Address: ${getEthAddress(keyPair.privateKey)}`);
+            break;
     }
     console.log('\n');
 }
-
-// gets the eth address using the private key
 function getEthAddress(privateKeyIn) {
     const privKeyBuffer = ethUtil.toBuffer(ethUtil.addHexPrefix(privateKeyIn));
     const addressBuffer = ethUtil.privateToAddress(privKeyBuffer);
@@ -154,21 +111,25 @@ function getEthAddress(privateKeyIn) {
     const checksumAddress = ethUtil.toChecksumAddress(hexAddress);
     return ethUtil.addHexPrefix(checksumAddress);
 }
-
-// gets the btc address using the private key
 function getBtcAddress(privateKey) {
     return bitcore_lib_1.PrivateKey.fromString(privateKey).toAddress(getBlockchainNetwork()).toString();
 }
-
-
 function main() {
-    MAINNET_MODE = true;
-    START_WALLET_INDEX = 0;
+    program
+        .version('0.1')
+        .description('Hierarchical key generation tool to compute addresses and key pairs for Ethos wallets')
+        .option('-n --network <type>', 'Network environment type for addresses and keys (main | test) [main]', 'main')
+        .option('-c --walletCount <count>', 'Number of wallet to return [10]', parseInt, 10)
+        .option('-i --walletIndex <index>', 'Starting index of first wallet returns [0]', parseInt, 0)
+        .parse(process.argv);
+    MAINNET_MODE = program.network === 'main';
+    START_WALLET_INDEX = program.walletIndex;
     NUM_WALLETS = program.walletCount;
     console.log(`Generating addresses for wallet ${START_WALLET_INDEX}`
         + ` through ${START_WALLET_INDEX + NUM_WALLETS}`);
+    console.log(`Address mode set to: ${program.network}`);
     console.log('\n');
-    
+    console.log('Enter mnemonic words:');
     promptInputAsPromise(buildSeedPromptSchema())
         .then((input) => {
         const mnemonic = promptInputToMnemonic(input);
@@ -176,8 +137,11 @@ function main() {
             console.log(`Invalid mnemonic provided.`);
             process.exit(1);
         }
+
         const seed = Bip39.mnemonicToSeedHex(mnemonic, '');
+        printDelimiter();
         printExtendedKeys(seed, EXTENDED_KEYPAIR_PATH);
+        printDelimiter();
         printWallets(seed, NUM_WALLETS);
     });
 }
