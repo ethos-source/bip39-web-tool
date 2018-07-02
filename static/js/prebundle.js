@@ -117,9 +117,7 @@ function printWallets(seed) {
             Address: <strong>${wallet.address}</strong>
         </div>
         `;
-        if (BLOCKCHAIN_TYPE == 0) {
-           htmlInsertion += construction; 
-        }
+        htmlInsertion += construction; 
     });
     return htmlInsertion;
 }
