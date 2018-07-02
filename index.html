@@ -9,15 +9,14 @@
   </head>
   <body>
     <form role="form">
-        <h2>Ethos BIP39 Tool</h2> 
-        <h2>
-            <small>Access your raw private/public key pairs</small>
+        <h2>Ethos BIP39 Tool<br>
+            <small>Derive your raw private/public key pairs</small>
         </h2>
         <div class="alert alert-danger">
             <strong>DANGER!!</strong> 
             <br>
             <br>
-            Understand that by using this tool you are potentially exposing your seed, and thus your private keys, to a potential attack surface which includes a heightened risk of losing some or all of your funds. Do not use this tool on any untrusted domain and do not assume that this tool is secure even if it is on a trusted domain. We highly recommend that you download the source of this tool, disconnect from the internet, and derive all of the information you need on the safety of an airgapped computer. By using this tool, you acknowledge this risk.
+            Understand that by using this tool you are potentially exposing your seed, and thus your private keys, to a potential attack surface which means a potentially heightened risk of losing some or all of your funds. Do not use this tool on any untrusted domain and do not assume that this tool is secure even if it is on a trusted domain. We highly recommend that you download the source of this tool, disconnect from the internet, and derive all of the information you need on the safety of an airgapped computer. By using this tool, you acknowledge this risk and hold Ethos harmless from any claims or losses that result from the use of this tool.
             <br>
             <br>
             <strong>ETHOS DOES NOT STORE OR TRANSMIT YOUR PRIVATE KEYS OVER THE INTERNET AND NO ETHOS REPRESENTATIVE WILL EVER ASK YOU FOR YOUR PRIVATE KEYS</strong> 
@@ -60,10 +59,10 @@
         <br>
         <div class="row">
             <div class="col-xs-12 col-sm-6 col-md-6">
-                <label>Starting Wallet Index</label><input type="number" id="startIndex" class="form-control input-lg" value="0">
+                <label>Starting Wallet Index</label><input type="number" id="startWalletIndex" class="form-control input-lg" value="0">
             </div>
             <div class="col-xs-12 col-sm-6 col-md-6">
-                <label>Wallets to Produce</label><input type="number" id="endIndex" class="form-control input-lg" value="10">
+                <label>Wallets to Produce</label><input type="number" id="numWallets" class="form-control input-lg" value="10">
             </div>
         </div>
         <hr class="colorgraph">
@@ -216,7 +215,8 @@
             <div class="col-xs-12 col-md-12"><a href="#" class="btn btn-success btn-block btn-lg">Derive Addresses</a></div>
         </div>
     </form>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <div id="walletInformation">
+
+    </div>
   </body>
 </html>

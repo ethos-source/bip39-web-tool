@@ -54,8 +54,8 @@ function getExtendedPrivateKey(seed, xKeyPath) {
     const xPrivateKey = xKey.extendedPrivateKey;
     console.log(`Extended Private Key (at ${xKeyPath}): ${xPrivateKey}`);
     return {
-        "xKeyPath" : xKeyPath,
-        "xPrivateKey" : xPrivateKey
+        xKeyPath,
+        xPrivateKey
     }
 }
 
@@ -66,8 +66,8 @@ function getExtendedPublicKey(seed, xKeyPath) {
     const xPublicKey = xKey.extendedPublicKey;
     console.log(`Extended Public Key (at ${xKeyPath}): ${xPublicKey}`);
     return {
-        "xKeyPath" : xKeyPath,
-        "xPublicKey" : xPublicKey
+        xKeyPath,
+        PublicKey
     }
 }
 
@@ -100,11 +100,38 @@ function getDerivationPath(blockchainId, walletIndex, addressIndex) {
 
 // prints out wallets and loops through
 // probably won't be needed
-function printWallets(seed, numWallets) {
+function printWallets(seed) {
+    var htmlInsertion;
+    var construction;
     Array.from({ length: NUM_WALLETS }, (v, k) => k).forEach(i => {
-        printWalletDetails(seed, 0, START_WALLET_INDEX + i);
-        printWalletDetails(seed, 60, START_WALLET_INDEX + i);
+        var wallet = printWalletDetails(seed, 0, START_WALLET_INDEX + i);
+        construction = `
+        <div class="alert alert-info">
+            Wallet Index: <strong>${wallet.walletIndex}</strong> at <strong>${wallet.path}</strong>
+            <br>
+            Public Key: <strong>${wallet.publicKey}</strong>
+            <br>
+            Private Key: <strong>${wallet.privateKey}</strong>
+            <br>
+            Address: <strong>${wallet.address}</strong>
+        </div>
+        `;
+        htmlInsertion += construction;
+        wallet = printWalletDetails(seed, 60, START_WALLET_INDEX + i);
+        construction = `
+        <div class="alert alert-info">
+            Wallet Index: <strong>${wallet.walletIndex}</strong> at <strong>${wallet.path}</strong>
+            <br>
+            Public Key: <strong>${wallet.publicKey}</strong>
+            <br>
+            Private Key: <strong>${wallet.privateKey}</strong>
+            <br>
+            Address: <strong>${wallet.address}</strong>
+        </div>
+        `;
+        htmlInsertion += construction;
     });
+    return htmlInsertion;
 }
 
 // prints out details relating to the wallet
@@ -118,22 +145,24 @@ function printWalletDetails(seed, blockchainId, walletIndex) {
     console.log(`Private Key: ${privateKey}`);
     switch (blockchainId) {
         case 0:
-            var btcAddress = getBtcAddress(keyPair.privateKey);
+            var address = getBtcAddress(keyPair.privateKey);
+            console.log(`Address: ${address}`);
             return {
-                "walletIndex" : walletIndex,
-                "path" : path,
-                "publicKey" : publicKey,
-                "privateKey" : privateKey,
-                "btcAddress" : btcAddress
+                walletIndex,
+                path,
+                publicKey,
+                privateKey,
+                address
             }
         case 60:
-            var ethAddress = getEthAddress(keyPair.privateKey);
+            var address = getEthAddress(keyPair.privateKey);
+            console.log(`Address: ${address}`);
             return {
-                "walletIndex" : walletIndex,
-                "path" : path,
-                "publicKey" : publicKey,
-                "privateKey" : privateKey,
-                "ethAddress" : ethAddress
+                walletIndex,
+                path,
+                publicKey,
+                privateKey,
+                address
             }
     }
     console.log('\n');
@@ -164,9 +193,20 @@ function getSeed() {
         arr.push(word);
     }
     mnemonic = arr.join(" ");
-    console.log(mnemonic);
     const seed = Bip39.mnemonicToSeedHex(mnemonic, '');
     return seed;
 }
-// export getSeed
-window.getSeed = getSeed;
+
+function generate() {
+    var seed = getSeed();
+    MAINNET_MODE = $("#networkType option:selected").val() === 1;
+    console.log("MAINNET_MODE: " + MAINNET_MODE);
+    NUM_WALLETS = $("#numWallets").val()*1;
+    console.log("NUM_WALLETS: " + NUM_WALLETS);
+    START_WALLET_INDEX = $("#startWalletIndex").val()*1;
+    console.log("START_WALLET_INDEX: " + START_WALLET_INDEX);
+    var htmlInsertion = printWallets(seed);
+    $("#walletInformation").html(htmlInsertion);
+}
+
+window.generate = generate;
