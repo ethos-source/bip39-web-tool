@@ -6,7 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "convert": "browserify static/js/prebundle.js -o static/js/bundle.js",
-    "start": "node server/server.js"
   },
   "author": "Ethos",
   "license": "ISC",

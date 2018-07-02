@@ -6,25 +6,26 @@ The purpose of this tool is to allow users to get additional data/insights about
 
 Open up index.html and enter in the required information to generate what you need
 
+You can also visit https://ethos-source.github.io/bip39-web-tool/ which is hosted on Github pages.
+
+# IMPORTANT!!!!
+
+ETHOS DOES NOT HOST A COPY OF THIS AND DOES NOT HAVE ANY PLANS TO. THIS IS AN OPEN SOURCE TOOL THAT ETHOS HAS PROVIDED TO HELP YOU ACCESS YOUR PRIVATE KEYS. DO NOT USE ANY UNTRUSTED VERSIONS OF THIS APPLICATION.
+
 # For Developers
 
 Install all the dependencies by running `npm install`
 
-If you make any changes to **prebundle.js** then be sure to run `npm run convert` to bundle those changes before running `npm run start` or opening the file
+If you make any changes to **prebundle.js** then be sure to run `npm run convert` to bundle those changes
 
 # npm scripts
-
-`npm run start` starts a server that serves up the page at localhost:8080. This isn't necessary as you can just open the file without a web server.
 
 `npm run convert` converts the node file **prebundle.js** in `static/js/` and converts it to **bundle.js** that can be embedded in a browser
 
 # Structure of the code
 
-##### Server code
-All server code is held in `server/`
-
 ##### Static folder
-Everything that is served up from a static express path is in the static folder. That includes the css and the javascript
+Everything that is served up from a static express path is in the static folder. That includes the css and the javascript and images
 
 ##### index.html
-This is the main page that gets served up by the server
+This is the main page
