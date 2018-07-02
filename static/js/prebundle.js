@@ -8,6 +8,7 @@ const MNEMONIC_WORDCOUNT = 24;
 let MAINNET_MODE = true;
 let NUM_WALLETS = 10;
 let START_WALLET_INDEX = 0;
+let BLOCKCHAIN_TYPE = 0;
 const EXTENDED_KEYPAIR_PATH = `m/244'`;
 // NOTE: I AM NOT USING THE SCHEMA VERIFICATION RIGHT NOW
 // WE SHOULD USE SCHEMA VERIFICATION PRIOR TO RELEASING THIS
@@ -101,10 +102,10 @@ function getDerivationPath(blockchainId, walletIndex, addressIndex) {
 // prints out wallets and loops through
 // probably won't be needed
 function printWallets(seed) {
-    var htmlInsertion;
-    var construction;
+    var htmlInsertion = "<br>";
+    var construction = "";
     Array.from({ length: NUM_WALLETS }, (v, k) => k).forEach(i => {
-        var wallet = printWalletDetails(seed, 0, START_WALLET_INDEX + i);
+        var wallet = printWalletDetails(seed, BLOCKCHAIN_TYPE, START_WALLET_INDEX + i);
         construction = `
         <div class="alert alert-info">
             Wallet Index: <strong>${wallet.walletIndex}</strong> at <strong>${wallet.path}</strong>
@@ -116,20 +117,9 @@ function printWallets(seed) {
             Address: <strong>${wallet.address}</strong>
         </div>
         `;
-        htmlInsertion += construction;
-        wallet = printWalletDetails(seed, 60, START_WALLET_INDEX + i);
-        construction = `
-        <div class="alert alert-info">
-            Wallet Index: <strong>${wallet.walletIndex}</strong> at <strong>${wallet.path}</strong>
-            <br>
-            Public Key: <strong>${wallet.publicKey}</strong>
-            <br>
-            Private Key: <strong>${wallet.privateKey}</strong>
-            <br>
-            Address: <strong>${wallet.address}</strong>
-        </div>
-        `;
-        htmlInsertion += construction;
+        if (BLOCKCHAIN_TYPE == 0) {
+           htmlInsertion += construction; 
+        }
     });
     return htmlInsertion;
 }
@@ -205,6 +195,8 @@ function generate() {
     console.log("NUM_WALLETS: " + NUM_WALLETS);
     START_WALLET_INDEX = $("#startWalletIndex").val()*1;
     console.log("START_WALLET_INDEX: " + START_WALLET_INDEX);
+    BLOCKCHAIN_TYPE = $("#blockchainType option:selected").val()*1;
+    console.log("BLOCKCHAIN_TYPE: " + BLOCKCHAIN_TYPE);
     var htmlInsertion = printWallets(seed);
     $("#walletInformation").html(htmlInsertion);
 }
