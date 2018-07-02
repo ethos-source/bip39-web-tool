@@ -2,13 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="css/bootstrap.min.css" rel="stylesheet"/>
     <link href="css/main.css" rel="stylesheet">
     <script type="text/javascript" src="js/bundle.js"></script>
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.min.js"
-      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-      crossorigin="anonymous"></script>
+    <script src="js/jquery-3.3.1.min.js"></script>
   </head>
   <body>
     <form role="form">
@@ -17,7 +14,57 @@
             <small>Access your raw private/public key pairs</small>
         </h2>
         <div class="alert alert-danger">
-            <strong>DANGER!</strong> Understand that by using this tool you are exposing your seed, and thus your private keys, to a potential attack surface which includes a heightened risk of losing some or all of your funds. Do not use this tool on any untrusted domain and do not assume that this tool is secure even if it is on a trusted domain. We highly recommend that you download the source of this tool, disconnect from the internet, and derive all of the information you need on the safety of an airgapped computer. By using this tool, you acknowledge this risk.
+            <strong>DANGER!!</strong> 
+            <br>
+            <br>
+            Understand that by using this tool you are potentially exposing your seed, and thus your private keys, to a potential attack surface which includes a heightened risk of losing some or all of your funds. Do not use this tool on any untrusted domain and do not assume that this tool is secure even if it is on a trusted domain. We highly recommend that you download the source of this tool, disconnect from the internet, and derive all of the information you need on the safety of an airgapped computer. By using this tool, you acknowledge this risk.
+            <br>
+            <br>
+            <strong>ETHOS DOES NOT STORE OR TRANSMIT YOUR PRIVATE KEYS OVER THE INTERNET AND NO ETHOS REPRESENTATIVE WILL EVER ASK YOU FOR YOUR PRIVATE KEYS</strong> 
+            <br>
+            <br>
+            This tool should not be used as a replacement or supplementary to the Ethos Universal Wallet. Use this tool only at your own risk and discretion. A customer service representative may suggest using this tool to help you get raw access to the private/public key pairs. Do not share any private keys that are produced by this tool with anyone.
+        </div>
+        <hr class="colorgraph">
+        <h2>Ethos Hierarchical Deterministic Wallets</h2>
+         <div class="alert alert-success">
+            <strong>Important Information!</strong> 
+            <br>
+            <br>
+            Ethos uses technology from BIP32, BIP39 and BIP44 to help you better manage your crypto assets. These allow you to create a nested, hierarchical structure from your seed using what are called derivation paths. Derivation paths derive a private/public key pair from a seed which is encoded as the 24 word mnemonic SmartKey that you create when you first use a SmartWallet.
+            <br>
+            <br>
+            Derivation paths are structured as follows: <strong>m/[purpose]/[coin type]/[account]/[ETHOS WALLET INDEX]/[change]/[ETHOS ADDRESS INDEX]</strong>
+            <br>
+            <br>
+            The fields that are exposed on this tool are the "Starting Wallet Index" which is the starting ETHOS WALLET INDEX and the number of wallets to produce from there. If you define 0 as the starting index and want to derive 15 wallets, then the tool will increment the ETHOS WALLET INDEX starting from 0 and go up to 14. 
+        </div>
+        <hr class="colorgraph">
+        <h2>Options</h2>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <label>Blockchain Type</label>
+                <select class="form-control input-lg" id="blockchainType">
+                  <option value="1">Bitcoin</option>
+                  <option value="60">Ethereum</option>
+                </select>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <label>Mainnet or Testnet</label>
+                <select class="form-control input-lg" id="networkType">
+                  <option value="1">Mainnet</option>
+                  <option value="0">Testnet</option>
+                </select>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <label>Starting Wallet Index</label><input type="number" id="startIndex" class="form-control input-lg" value="0">
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-6">
+                <label>Wallets to Produce</label><input type="number" id="endIndex" class="form-control input-lg" value="10">
+            </div>
         </div>
         <hr class="colorgraph">
         <div class="row">

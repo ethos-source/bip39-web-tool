@@ -5,7 +5,7 @@ const ethUtil = require("ethereumjs-util");
 const bitcore_lib_1 = require("bitcore-lib");
 const ENGLISH_WORDLIST = Bip39.wordlists.EN;
 const MNEMONIC_WORDCOUNT = 24;
-let MAINNET_MODE = false;
+let MAINNET_MODE = true;
 let NUM_WALLETS = 10;
 let START_WALLET_INDEX = 0;
 const EXTENDED_KEYPAIR_PATH = `m/244'`;
@@ -164,6 +164,9 @@ function getSeed() {
         arr.push(word);
     }
     mnemonic = arr.join(" ");
+    console.log(mnemonic);
     const seed = Bip39.mnemonicToSeedHex(mnemonic, '');
     return seed;
 }
+// export getSeed
+window.getSeed = getSeed;
