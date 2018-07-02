@@ -2,6 +2,12 @@
 
 The purpose of this tool is to allow users to get additional data/insights about their addresses through an easy-to-use web interface. 
 
+# How to Use
+
+Open up index.html and enter in the required information to generate what you need
+
+# For Developers
+
 Install all the dependencies by running `npm install`
 
 If you make any changes to **prebundle.js** then be sure to run `npm run convert` to bundle those changes before running `npm run start` or opening the file
