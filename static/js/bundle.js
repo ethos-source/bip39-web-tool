@@ -73453,26 +73453,20 @@ function promptInputAsPromise(schema) {
 
 // Extended Private Key
 // Returns string with extended private key
-function getExtendedPrivateKey(seed, xKeyPath) {
-    const xKey = getKeyPair(seed, xKeyPath);
+function getExtendedPrivateKey(seed) {
+    const xKey = getKeyPair(seed, EXTENDED_KEYPAIR_PATH);
     const xPrivateKey = xKey.extendedPrivateKey;
-    console.log(`Extended Private Key (at ${xKeyPath}): ${xPrivateKey}`);
-    return {
-        xKeyPath,
-        xPrivateKey
-    }
+    var construction = `Extended Private Key (at ${EXTENDED_KEYPAIR_PATH}): ${xPrivateKey}`;
+    return construction;
 }
 
 // Extended Public Key
 // Returns string with extended public key
-function getExtendedPublicKey(seed, xKeyPath) {
-    const xKey = getKeyPair(seed, xKeyPath);
+function getExtendedPublicKey(seed) {
+    const xKey = getKeyPair(seed, EXTENDED_KEYPAIR_PATH);
     const xPublicKey = xKey.extendedPublicKey;
-    console.log(`Extended Public Key (at ${xKeyPath}): ${xPublicKey}`);
-    return {
-        xKeyPath,
-        PublicKey
-    }
+    var construction = `Extended Private Key (at ${EXTENDED_KEYPAIR_PATH}): ${xPublicKey}`;
+    return construction;
 }
 
 // returns extendedPrivateKey, extendedPublicKey, privateKey and publicKey
@@ -73600,6 +73594,8 @@ function generate() {
     console.log("BLOCKCHAIN_TYPE: " + BLOCKCHAIN_TYPE);
     var htmlInsertion = printWallets(seed);
     $("#walletInformation").html(htmlInsertion);
+    $("#xPublicKey").html(getExtendedPublicKey(seed));
+    $("#xPrivateKey").html(getExtendedPrivateKey(seed));
 }
 
 window.generate = generate;
