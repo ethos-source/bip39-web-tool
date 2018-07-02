@@ -73465,7 +73465,7 @@ function getExtendedPrivateKey(seed) {
 function getExtendedPublicKey(seed) {
     const xKey = getKeyPair(seed, EXTENDED_KEYPAIR_PATH);
     const xPublicKey = xKey.extendedPublicKey;
-    var construction = `Extended Private Key (at ${EXTENDED_KEYPAIR_PATH}): ${xPublicKey}`;
+    var construction = `Extended Public Key (at ${EXTENDED_KEYPAIR_PATH}): ${xPublicKey}`;
     return construction;
 }
 
