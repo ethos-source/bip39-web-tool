@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Bip39 = require("bip39");
 const ethUtil = require("ethereumjs-util");
-const bitcore_lib_1 = require("bitcore-lib");
+const bitcore_lib = require("bitcore-lib");
 const ENGLISH_WORDLIST = Bip39.wordlists.EN;
 const MNEMONIC_WORDCOUNT = 24;
 let MAINNET_MODE = true;
@@ -69,7 +69,7 @@ function getExtendedPublicKey(seed) {
 // returns extendedPrivateKey, extendedPublicKey, privateKey and publicKey
 // also checks for mainnet vs testnet
 function getKeyPair(seed, derivationPath) {
-    const hdPrivateKey = bitcore_lib_1.HDPrivateKey.fromSeed(seed, getBlockchainNetwork());
+    const hdPrivateKey = bitcore_lib.HDPrivateKey.fromSeed(seed, getBlockchainNetwork());
     let extendedPrivateKey = hdPrivateKey.derive(derivationPath);
     const extendedPublicKey = extendedPrivateKey.hdPublicKey.toString('hex');
     const privateKey = extendedPrivateKey.privateKey.toString('hex');
@@ -85,7 +85,7 @@ function getKeyPair(seed, derivationPath) {
 
 // returns testnet vs mainnet
 function getBlockchainNetwork() {
-    return MAINNET_MODE ? bitcore_lib_1.Networks.livenet : bitcore_lib_1.Networks.testnet;
+    return MAINNET_MODE ? bitcore_lib.Networks.livenet : bitcore_lib.Networks.testnet;
 }
 
 // constructs the derviation path
@@ -161,7 +161,7 @@ function getEthAddress(privateKey) {
 
 // gets the btc address using the private key
 function getBtcAddress(privateKey) {
-    return bitcore_lib_1.PrivateKey.fromString(privateKey).toAddress(getBlockchainNetwork()).toString();
+    return bitcore_lib.PrivateKey.fromString(privateKey).toAddress(getBlockchainNetwork()).toString();
 }
 
 // get the seed and return the raw seed
