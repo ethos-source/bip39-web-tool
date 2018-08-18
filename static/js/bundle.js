@@ -73492,8 +73492,8 @@ function getBlockchainNetwork() {
 }
 
 // constructs the derviation path
-function getDerivationPath(blockchainId, walletIndex, addressIndex) {
-    return `${EXTENDED_KEYPAIR_PATH}/0/${blockchainId}/${walletIndex}/0/${addressIndex}`;
+function getDerivationPath(blockchainId, walletIndex) {
+    return `${EXTENDED_KEYPAIR_PATH}/0/${blockchainId}/${walletIndex}/0`;
 }
 
 // prints out wallets and loops through
@@ -73521,7 +73521,7 @@ function printWallets(seed) {
 
 // prints out details relating to the wallet
 function printWalletDetails(seed, blockchainId, walletIndex) {
-    const path = getDerivationPath(blockchainId, walletIndex, 0);
+    const path = getDerivationPath(blockchainId, walletIndex);
     const keyPair = getKeyPair(seed, path);
     const publicKey = keyPair.publicKey;
     const privateKey = keyPair.privateKey;
