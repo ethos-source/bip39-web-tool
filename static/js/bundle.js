@@ -100975,8 +100975,13 @@ function getExtendedPublicKey(seed) {
 // returns extendedPrivateKey, extendedPublicKey, privateKey and publicKey
 // also checks for mainnet vs testnet
 function getKeyPair(seed, derivationPath) {
-    const hdPrivateKey = bitcore_lib.HDPrivateKey.fromSeed(seed);
-    // console.log(hdPrivateKey.derive(derivationPath));
+   
+    // litecoin logic
+    const ltcHDPrivateKey = litecore.HDPrivateKey.fromSeed(seed, litecore.Networks.livenet);
+    let ltcExtendedPrivateKey = ltcHDPrivateKey.derive(derivationPath);
+    const ltcExportedWIF = ltcExtendedPrivateKey.privateKey.toWIF();
+    // bitcoin logic
+    const hdPrivateKey = bitcore_lib.HDPrivateKey.fromSeed(seed, bitcore_lib.Networks.livenet);
     let extendedPrivateKey = hdPrivateKey.derive(derivationPath);
     const extendedPublicKey = extendedPrivateKey.hdPublicKey.toString('hex');
     const privateKey = extendedPrivateKey.privateKey.toString('hex');
@@ -100988,7 +100993,8 @@ function getKeyPair(seed, derivationPath) {
         extendedPublicKey,
         privateKey,
         publicKey,
-        exportedWIF
+        exportedWIF,
+        ltcExportedWIF
     };
 }
 
@@ -101044,7 +101050,7 @@ function printWalletDetails(seed, blockchainId, walletIndex) {
             }
         case 2:
         // Litecoin logic
-            var address = getLtcAddress(keyPair.exportedWIF);
+            var address = getLtcAddress(keyPair.ltcExportedWIF);
             console.log(`Address: ${address}`);
             return {
                 walletIndex,
@@ -101083,7 +101089,7 @@ function getBtcAddress(WIF) {
 }
 // gets the ltc address using the private key
 function getLtcAddress(WIF) {
-    return litecore.PrivateKey.fromWIF(WIF).toAddress(Networks.livenet).toString();
+    return litecore.PrivateKey.fromWIF(WIF).toAddress().toString();
 }
 
 // get the seed and return the raw seed
