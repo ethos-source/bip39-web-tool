@@ -5,7 +5,6 @@ const ethUtil = require("ethereumjs-util");
 const bitcore_lib = require("bitcore-lib");
 const ENGLISH_WORDLIST = Bip39.wordlists.EN;
 const MNEMONIC_WORDCOUNT = 24;
-let MAINNET_MODE = true;
 let NUM_WALLETS = 10;
 let START_WALLET_INDEX = 0;
 let BLOCKCHAIN_TYPE = 0;
@@ -69,23 +68,21 @@ function getExtendedPublicKey(seed) {
 // returns extendedPrivateKey, extendedPublicKey, privateKey and publicKey
 // also checks for mainnet vs testnet
 function getKeyPair(seed, derivationPath) {
-    const hdPrivateKey = bitcore_lib.HDPrivateKey.fromSeed(seed, getBlockchainNetwork());
+    const hdPrivateKey = bitcore_lib.HDPrivateKey.fromSeed(seed);
+    // console.log(hdPrivateKey.derive(derivationPath));
     let extendedPrivateKey = hdPrivateKey.derive(derivationPath);
     const extendedPublicKey = extendedPrivateKey.hdPublicKey.toString('hex');
     const privateKey = extendedPrivateKey.privateKey.toString('hex');
     const publicKey = extendedPrivateKey.publicKey.toString('hex');
+    const exportedWIF = extendedPrivateKey.privateKey.toWIF();
     extendedPrivateKey = extendedPrivateKey.toString('hex');
     return {
         extendedPrivateKey,
         extendedPublicKey,
         privateKey,
         publicKey,
+        exportedWIF
     };
-}
-
-// returns testnet vs mainnet
-function getBlockchainNetwork() {
-    return MAINNET_MODE ? bitcore_lib.Networks.livenet : bitcore_lib.Networks.testnet;
 }
 
 // constructs the derviation path
@@ -122,12 +119,13 @@ function printWalletDetails(seed, blockchainId, walletIndex) {
     const keyPair = getKeyPair(seed, path);
     const publicKey = keyPair.publicKey;
     const privateKey = keyPair.privateKey;
+    const exportedWIF = keyPair.exportedWIF;
     console.log(`Wallet Index ${walletIndex} (at ${path})`);
     console.log(`Public Key: ${publicKey}`);
     console.log(`Private Key: ${privateKey}`);
     switch (blockchainId) {
         case 0:
-            var address = getBtcAddress(keyPair.privateKey);
+            var address = getBtcAddress(keyPair.exportedWIF);
             console.log(`Address: ${address}`);
             return {
                 walletIndex,
@@ -160,8 +158,8 @@ function getEthAddress(privateKey) {
 }
 
 // gets the btc address using the private key
-function getBtcAddress(privateKey) {
-    return bitcore_lib.PrivateKey.fromString(privateKey).toAddress(getBlockchainNetwork()).toString();
+function getBtcAddress(WIF) {
+    return bitcore_lib.PrivateKey.fromWIF(WIF).toAddress().toString();
 }
 
 // get the seed and return the raw seed
@@ -181,8 +179,6 @@ function getSeed() {
 
 function generate() {
     var seed = getSeed();
-    MAINNET_MODE = $("#networkType option:selected").val() === 1;
-    console.log("MAINNET_MODE: " + MAINNET_MODE);
     NUM_WALLETS = $("#numWallets").val()*1;
     console.log("NUM_WALLETS: " + NUM_WALLETS);
     START_WALLET_INDEX = $("#startWalletIndex").val()*1;
