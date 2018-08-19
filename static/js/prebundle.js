@@ -4,6 +4,7 @@ const Bip39 = require("bip39");
 const ethUtil = require("ethereumjs-util");
 const bitcore_lib = require("bitcore-lib");
 const litecore = require('litecore');
+const dashcore = require('@dashevo/dashcore-lib');
 const ENGLISH_WORDLIST = Bip39.wordlists.EN;
 const MNEMONIC_WORDCOUNT = 24;
 let NUM_WALLETS = 10;
@@ -69,12 +70,22 @@ function getExtendedPublicKey(seed) {
 // returns extendedPrivateKey, extendedPublicKey, privateKey and publicKey
 // also checks for mainnet vs testnet
 function getKeyPair(seed, derivationPath) {
-   
+    // instantiated up here to return blank if BLOCKCHAIN_TYPE isn't selected for the coin
+    let ltcExportedWIF;
+    let dashExportedWIF;
     // litecoin logic
-    const ltcHDPrivateKey = litecore.HDPrivateKey.fromSeed(seed, litecore.Networks.livenet);
-    let ltcExtendedPrivateKey = ltcHDPrivateKey.derive(derivationPath);
-    const ltcExportedWIF = ltcExtendedPrivateKey.privateKey.toWIF();
-    // bitcoin logic
+    if (BLOCKCHAIN_TYPE == 2) {
+        const ltcHDPrivateKey = litecore.HDPrivateKey.fromSeed(seed, litecore.Networks.livenet);
+        let ltcExtendedPrivateKey = ltcHDPrivateKey.derive(derivationPath);
+        ltcExportedWIF = ltcExtendedPrivateKey.privateKey.toWIF();
+    }
+    // dash logic
+    if (BLOCKCHAIN_TYPE == 5) {
+        const dashHDPrivateKey = dashcore.HDPrivateKey.fromSeed(seed, dashcore.Networks.livenet);
+        let dashExtendedPrivateKey = dashHDPrivateKey.derive(derivationPath);
+        dashExportedWIF = dashExtendedPrivateKey.privateKey.toWIF();
+    } 
+    // generic logic (Bitcoin/Ethereum)
     const hdPrivateKey = bitcore_lib.HDPrivateKey.fromSeed(seed, bitcore_lib.Networks.livenet);
     let extendedPrivateKey = hdPrivateKey.derive(derivationPath);
     const extendedPublicKey = extendedPrivateKey.hdPublicKey.toString('hex');
@@ -88,7 +99,8 @@ function getKeyPair(seed, derivationPath) {
         privateKey,
         publicKey,
         exportedWIF,
-        ltcExportedWIF
+        ltcExportedWIF,
+        dashExportedWIF
     };
 }
 
@@ -153,6 +165,17 @@ function printWalletDetails(seed, blockchainId, walletIndex) {
                 privateKey,
                 address
             }
+        case 5:
+        // Dash logic
+            var address = getDashAddress(keyPair.dashExportedWIF);
+            console.log(`Address: ${address}`);
+            return {
+                walletIndex,
+                path,
+                publicKey,
+                privateKey,
+                address
+            }
         case 60:
         // Ethereum Logic
             var address = getEthAddress(keyPair.privateKey);
@@ -184,6 +207,10 @@ function getBtcAddress(WIF) {
 // gets the ltc address using the private key
 function getLtcAddress(WIF) {
     return litecore.PrivateKey.fromWIF(WIF).toAddress().toString();
+}
+// gets the dash address using the private key
+function getDashAddress(WIF) {
+    return dashcore.PrivateKey.fromWIF(WIF).toAddress().toString();
 }
 
 // get the seed and return the raw seed
