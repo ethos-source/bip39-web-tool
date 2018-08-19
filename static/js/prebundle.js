@@ -177,7 +177,7 @@ function getBtcAddress(WIF) {
 }
 // gets the ltc address using the private key
 function getLtcAddress(WIF) {
-    return litecore.PrivateKey.fromWIF(WIF).toAddress().toString();
+    return litecore.PrivateKey.fromWIF(WIF).toAddress(Networks.livenet).toString();
 }
 
 // get the seed and return the raw seed
