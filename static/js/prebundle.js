@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Bip39 = require("bip39");
 const ethUtil = require("ethereumjs-util");
 const bitcore_lib = require("bitcore-lib");
+const litecore = require('litecore');
 const ENGLISH_WORDLIST = Bip39.wordlists.EN;
 const MNEMONIC_WORDCOUNT = 24;
 let NUM_WALLETS = 10;
@@ -125,6 +126,7 @@ function printWalletDetails(seed, blockchainId, walletIndex) {
     console.log(`Private Key: ${privateKey}`);
     switch (blockchainId) {
         case 0:
+        // Bitcoin logic
             var address = getBtcAddress(keyPair.exportedWIF);
             console.log(`Address: ${address}`);
             return {
@@ -134,7 +136,19 @@ function printWalletDetails(seed, blockchainId, walletIndex) {
                 privateKey,
                 address
             }
+        case 2:
+        // Litecoin logic
+            var address = getLtcAddress(keyPair.exportedWIF);
+            console.log(`Address: ${address}`);
+            return {
+                walletIndex,
+                path,
+                publicKey,
+                privateKey,
+                address
+            }
         case 60:
+        // Ethereum Logic
             var address = getEthAddress(keyPair.privateKey);
             console.log(`Address: ${address}`);
             return {
@@ -160,6 +174,10 @@ function getEthAddress(privateKey) {
 // gets the btc address using the private key
 function getBtcAddress(WIF) {
     return bitcore_lib.PrivateKey.fromWIF(WIF).toAddress().toString();
+}
+// gets the ltc address using the private key
+function getLtcAddress(WIF) {
+    return litecore.PrivateKey.fromWIF(WIF).toAddress().toString();
 }
 
 // get the seed and return the raw seed
