@@ -106,7 +106,7 @@ function getKeyPair(seed, derivationPath) {
 
 // constructs the derviation path
 function getDerivationPath(blockchainId, walletIndex) {
-    return `${EXTENDED_KEYPAIR_PATH}/0/${blockchainId}/${walletIndex}/0`;
+    return `${EXTENDED_KEYPAIR_PATH}/0/${blockchainId}/${walletIndex}/0/0`;
 }
 
 // prints out wallets and loops through

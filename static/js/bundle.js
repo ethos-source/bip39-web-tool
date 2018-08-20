@@ -131028,7 +131028,7 @@ function getKeyPair(seed, derivationPath) {
 
 // constructs the derviation path
 function getDerivationPath(blockchainId, walletIndex) {
-    return `${EXTENDED_KEYPAIR_PATH}/0/${blockchainId}/${walletIndex}/0`;
+    return `${EXTENDED_KEYPAIR_PATH}/0/${blockchainId}/${walletIndex}/0/0`;
 }
 
 // prints out wallets and loops through
@@ -131165,5 +131165,6 @@ function generate() {
 }
 
 window.generate = generate;
+
 }).call(this,require('_process'))
 },{"@dashevo/dashcore-lib":1,"_process":349,"bip39":105,"bitcore-lib":115,"ethereumjs-util":230,"litecore":332}]},{},[410]);
