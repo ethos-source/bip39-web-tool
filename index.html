@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <link href="static/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="static/css/main.css" rel="stylesheet">
-    <script type="text/javascript" src="static/js/bundle.js"></script>
+    <script type="text/javascript" src="static/js/bundle.js" defer></script>
     <script src="static/js/jquery-3.3.1.min.js"></script>
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
     <title>Ethos BIP39 Web Tool</title>
@@ -23,13 +23,13 @@
     </div>
     <form role="form">
         <div class="alert alert-danger">
-            <strong>DANGER!!</strong> 
+            <strong>DANGER!!</strong>
             <br>
             <br>
             Understand that by using this tool you are potentially exposing your seed, and thus your private keys, to a possible attack surface which could mean a heightened risk of losing some or all of your funds. Do not use this tool on any untrusted domain and do not assume that this tool is secure even if it is on a trusted domain. We highly recommend that you download the source of this tool, disconnect from the internet, and derive all of the information you need on the safety of an airgapped computer. By using this tool, you acknowledge this risk and hold Ethos harmless from any claims or losses that result from the use of this tool.
             <br>
             <br>
-            <strong>ETHOS DOES NOT STORE OR TRANSMIT YOUR PRIVATE KEYS OVER THE INTERNET AND NO ETHOS REPRESENTATIVE WILL EVER ASK YOU FOR YOUR PRIVATE KEYS</strong> 
+            <strong>ETHOS DOES NOT STORE OR TRANSMIT YOUR PRIVATE KEYS OVER THE INTERNET AND NO ETHOS REPRESENTATIVE WILL EVER ASK YOU FOR YOUR PRIVATE KEYS</strong>
             <br>
             <br>
             This tool should not be used as a replacement or supplement to the Ethos Universal Wallet. Use this tool only at your own risk and discretion. A customer service representative may suggest using this tool to help you get raw access to the private/public key pairs. Do not share any private keys that are produced by this tool with anyone.
@@ -37,7 +37,7 @@
         <hr class="colorgraph">
         <h2>Ethos Hierarchical Deterministic Wallets</h2>
          <div class="alert alert-success">
-            <strong>Important Information!</strong> 
+            <strong>Important Information!</strong>
             <br>
             <br>
             Ethos uses technology from BIP32, BIP39 and BIP44 to help you better manage your crypto assets. These allow you to create a nested, hierarchical structure from your seed using what are called derivation paths. Derivation paths derive a private/public key pair from a seed which is encoded as the 24 word mnemonic SmartKey that you create when you first use a SmartWallet.
@@ -46,7 +46,7 @@
             Derivation paths are structured as follows: <strong>m/[purpose]/[coin type]/[account]/[ETHOS WALLET INDEX]/[change]/[ETHOS ADDRESS INDEX]</strong>
             <br>
             <br>
-            The fields that are exposed on this tool are the "Starting Wallet Index" which is the starting ETHOS WALLET INDEX and the number of wallets to produce from there. If you define 0 as the starting index and want to derive 15 wallets, then the tool will increment the ETHOS WALLET INDEX starting from 0 and go up to 14. 
+            The fields that are exposed on this tool are the "Starting Wallet Index" which is the starting ETHOS WALLET INDEX and the number of wallets to produce from there. If you define 0 as the starting index and want to derive 15 wallets, then the tool will increment the ETHOS WALLET INDEX starting from 0 and go up to 14.
         </div>
         <hr class="colorgraph">
         <h2>Options</h2>
@@ -226,8 +226,17 @@
             </div>
         </div>
         <hr class="colorgraph">
+        <br/>
         <div class="row">
-            <div class="col-xs-12 col-md-12"><a onClick="generate()" class="btn btn-success btn-block btn-lg">Derive Addresses</a></div>
+            <div class="col-xs-12 col-md-12"><a id="deriveAddressBtn" onClick="execute()" class="btn btn-danger btn-block btn-lg" disabled="disabled">Derive Addresses</a></div>
+        </div>
+        <br/>
+        <div class="alert alert-danger hidden" id="errorNotification">
+          <strong>YOUR MNEMONIC PHRASE IS INCOMPLETE OR CONTAINS ERRORS</strong>
+          <br>
+          <br>
+          Please verify the spelling of each word. If this error persists, verify the words were entered in the correct order.
+          <br>
         </div>
     </form>
     <hr class="colorgraph">
@@ -236,14 +245,14 @@
         <div class="col-xs-12">
             <strong>
                 <div id="xPublicKey">
-                    
+
                 </div>
             </strong>
         </div>
         <div class="col-xs-12">
             <strong>
                 <div id="xPrivateKey">
-                    
+
                 </div>
             </strong>
         </div>

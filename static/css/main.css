@@ -14,3 +14,7 @@ body {
 	padding-left: 45px;
 	padding-bottom: 150px;
 }
+
+input[type="text"]:invalid {
+  border: 5px solid red;
+}

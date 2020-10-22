@@ -11,43 +11,6 @@ let NUM_WALLETS = 10;
 let START_WALLET_INDEX = 0;
 let BLOCKCHAIN_TYPE = 0;
 const EXTENDED_KEYPAIR_PATH = `m/244'`;
-// NOTE: I AM NOT USING THE SCHEMA VERIFICATION RIGHT NOW
-// WE SHOULD USE SCHEMA VERIFICATION PRIOR TO RELEASING THIS
-
-// build the schema to validate the seed format
-function buildSeedPromptSchema() {
-    let i = 1;
-    const schema = Array.from({ length: MNEMONIC_WORDCOUNT }, () => {
-        return {
-            name: `Word ${i++}`,
-            type: 'string',
-            hidden: true,
-            replace: '*',
-            required: true,
-            message: 'Mnemonic word is not correct.',
-            before: (word) => {
-                return word.toLowerCase().trim();
-            },
-            conform: (word) => {
-                return ENGLISH_WORDLIST.find(val => val === word.toLowerCase().trim());
-            },
-        };
-    });
-    return schema;
-}
-
-// schema verification
-function promptInputAsPromise(schema) {
-    return new Promise((resolve) => {
-        Prompt.get(schema, (error, input) => {
-            if (error) {
-                console.log('Input validation failed');
-                process.exit(1);
-            }
-            return resolve(input);
-        });
-    });
-}
 
 // Extended Private Key
 // Returns string with extended private key
@@ -84,7 +47,7 @@ function getKeyPair(seed, derivationPath) {
         const dashHDPrivateKey = dashcore.HDPrivateKey.fromSeed(seed, dashcore.Networks.livenet);
         let dashExtendedPrivateKey = dashHDPrivateKey.derive(derivationPath);
         dashExportedWIF = dashExtendedPrivateKey.privateKey.toWIF();
-    } 
+    }
     // generic logic (Bitcoin/Ethereum)
     const hdPrivateKey = bitcore_lib.HDPrivateKey.fromSeed(seed, bitcore_lib.Networks.livenet);
     let extendedPrivateKey = hdPrivateKey.derive(derivationPath);
@@ -127,7 +90,7 @@ function printWallets(seed) {
             Address: <strong>${wallet.address}</strong>
         </div>
         `;
-        htmlInsertion += construction; 
+        htmlInsertion += construction;
     });
     return htmlInsertion;
 }
@@ -213,19 +176,13 @@ function getDashAddress(WIF) {
     return dashcore.PrivateKey.fromWIF(WIF).toAddress().toString();
 }
 
-// get the seed and return the raw seed
-function getSeed() {
-    var i;
-    var arr = [];
-    var mnemonic;
-    for (i = 0; i < 24; i++) {
-        var location = "#word" + i;
-        var word = $(location).val().toLowerCase();
-        arr.push(word);
-    }
-    mnemonic = arr.join(" ");
-    const seed = Bip39.mnemonicToSeedHex(mnemonic, '');
-    return seed;
+function execute() {
+  if (isValidMnemonicPhrase()) {
+    setDerivationErrorState(false);
+    generate();
+  } else {
+    setDerivationErrorState(true);
+  }
 }
 
 function generate() {
@@ -242,4 +199,52 @@ function generate() {
     $("#xPrivateKey").html(getExtendedPrivateKey(seed));
 }
 
-window.generate = generate;
+function setDerivationErrorState(isError) {
+  const btn = document.getElementById('deriveAddressBtn');
+  const errorMsg = document.getElementById('errorNotification');
+
+  if (isError) {
+    btn.classList.add('btn-danger');
+    btn.classList.remove('btn-success');
+    btn.setAttribute('disabled', 'true');
+    errorMsg.classList.remove('hidden');
+  } else {
+    btn.classList.add('btn-success');
+    btn.classList.remove('btn-danger');
+    btn.removeAttribute('disabled');
+    errorMsg.classList.add('hidden');
+  }
+}
+
+function registerEvents() {
+  for (const input of mnemonicInputs()) {
+    input.addEventListener('change', function(e) {
+      if ((this.value.length >= 3) && !isValidBip39Word(this.value)) {
+        this.setCustomValidity('Incorrect mnemonic word');
+        if (!isValidMnemonicPhrase()) setDerivationErrorState(true);
+      }
+    });
+    input.addEventListener('input', function(e) {
+      if ((this.value.length == 0) || isValidBip39Word(this.value)) {
+        this.setCustomValidity('');
+        if (isValidMnemonicPhrase()) setDerivationErrorState(false);
+      }
+    });
+  }
+}
+
+function *mnemonicInputs() {
+  for (let i=0; i < 24; i++) {
+    yield document.getElementById(`word${i}`);
+  }
+}
+
+const getMnemonicWords = () => Array.from(mnemonicInputs(), (input) => input.value.toLowerCase());
+const getMnemonicPhrase = () => getMnemonicWords().join(' ');
+const getSeed = () => Bip39.mnemonicToSeedSync(getMnemonicPhrase(), '');
+const isValidMnemonicPhrase = () => (getMnemonicWords().filter(w => w.trim() !== '').length === 24) &&
+  Bip39.validateMnemonic(getMnemonicPhrase());
+const isValidBip39Word = (word) => Bip39.wordlists.english.includes(word.toLowerCase().trim());
+
+registerEvents();
+window.execute = execute;
