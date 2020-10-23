@@ -5,6 +5,8 @@ const ethUtil = require("ethereumjs-util");
 const bitcore_lib = require("bitcore-lib");
 const litecore = require('litecore');
 const dashcore = require('@dashevo/dashcore-lib');
+const cardanoCrypto = require('cardano-crypto.js');
+
 const ENGLISH_WORDLIST = Bip39.wordlists.EN;
 const MNEMONIC_WORDCOUNT = 24;
 let NUM_WALLETS = 10;
@@ -36,6 +38,11 @@ function getKeyPair(seed, derivationPath) {
     // instantiated up here to return blank if BLOCKCHAIN_TYPE isn't selected for the coin
     let ltcExportedWIF;
     let dashExportedWIF;
+
+    // Cardano
+    if (BLOCKCHAIN_TYPE == 1815) {
+      return getCardanoKeys(derivationPath);
+    }
     // litecoin logic
     if (BLOCKCHAIN_TYPE == 2) {
         const ltcHDPrivateKey = litecore.HDPrivateKey.fromSeed(seed, litecore.Networks.livenet);
@@ -150,8 +157,133 @@ function printWalletDetails(seed, blockchainId, walletIndex) {
                 privateKey,
                 address
             }
+        case 1815:
+        // Cardano
+            var address = getCardanoAddress(seed, path);
+            console.log(`Address: ${address}`);
+            return {
+              walletIndex,
+              path,
+              publicKey,
+              privateKey,
+              address
+          }
     }
     console.log('\n');
+}
+
+/**
+ * HD node groups privateKey, publicKey and chainCode
+ * can be initialized from Buffers or single string
+ * @param privateKey as Buffer
+ * @param publicKey as Buffer
+ * @param chainCode as Buffer
+ */
+const hdNode = ({ secret, privateKey, publicKey, chainCode }) => {
+  let privateKeyToUse;
+  let publicKeyToUse;
+  let chainCodeToUse;
+  let secretToUse;
+
+  if (secret) {
+    privateKeyToUse = secret.slice(0, 64);
+    publicKeyToUse = secret.slice(64, 96);
+    chainCodeToUse = secret.slice(96, 128);
+  } else {
+    secretToUse = Buffer.concat([privateKey, publicKey, chainCode]);
+  }
+
+
+  privateKeyToUse = privateKeyToUse ? privateKeyToUse : privateKey;
+  publicKeyToUse = publicKeyToUse ? publicKeyToUse : publicKey;
+  chainCodeToUse = chainCodeToUse ? chainCodeToUse : chainCode;
+  secretToUse = secretToUse ? secretToUse : secret;
+
+  const xpub = Buffer.concat([publicKeyToUse, chainCodeToUse], 64);
+
+  const toBuffer = () => {
+    return Buffer.concat([privateKeyToUse, xpub]);
+  };
+
+  const toString = () => {
+    return toBuffer().toString('hex');
+  };
+
+  return {
+    xpub,
+    toBuffer,
+    toString,
+    privateKey: privateKeyToUse,
+    publicKey: publicKeyToUse,
+    chainCode: chainCodeToUse,
+  };
+};
+
+function getCardanoKeys(derivationPath) {
+  const childNode = deriveHdNodeCardano(getSeed(), derivationPath);
+  const extendedPublicKey = childNode.xpub.toString('hex');
+  const extendedPrivateKey = new Buffer.concat([childNode.privateKey, childNode.chainCode]).toString('hex');
+
+  return {
+    extendedPrivateKey,
+    extendedPublicKey,
+    privateKey: childNode.privateKey.toString('hex'),
+    publicKey: childNode.publicKey.toString('hex'),
+  };
+}
+
+const deriveChildNode = (node, childIndex) => {
+  const result = cardanoCrypto.derivePrivate(node.toBuffer(), childIndex, 2);
+  return hdNode({
+    secret: null,
+    privateKey: result.slice(0, 64),
+    publicKey: result.slice(64, 96),
+    chainCode: result.slice(96, 128),
+  });
+}
+
+function deriveHdNodeCardano(seedHex, derivationPath) {
+  const seed = Buffer.from(seedHex, 'hex');
+  const parentNode = hdNode({
+    secret: seed,
+    privateKey: null,
+    publicKey: null,
+    chainCode: null,
+  });
+
+  const pathArray = convertDerivationPathToArray(derivationPath);
+  return pathArray.reduce(deriveChildNode, parentNode);
+};
+
+function getXpubPair(seedHex, derivationPath) {
+  const seed = Buffer.from(seedHex, 'hex');
+  const parentNode = hdNode({
+    secret: seed,
+    privateKey: null,
+    publicKey: null,
+    chainCode: null,
+  });
+
+  const pathArray = convertDerivationPathToArray(derivationPath);
+  const xpubChildNode = pathArray.reduce(deriveChildNode, parentNode);
+  return {
+    xpub: xpubChildNode.xpub,
+    xpubMaster: parentNode.xpub,
+  };
+};
+
+function convertDerivationPathToArray(bip32Path) {
+  if (typeof bip32Path === 'number') return [bip32Path];
+  if (typeof bip32Path !== 'string') throw new Error('Specify Bip32 path in the correct format.');
+
+  const pathSplitArray = bip32Path.split('/');
+  const path = [];
+
+  for (let i = 0; i < pathSplitArray.length; i += 1) {
+    if (i === 0 && pathSplitArray[0].toLowerCase() === 'm') continue;
+    path.push(parseInt(pathSplitArray[i], 10));
+  }
+  return path;
 }
 
 // gets the eth address using the private key
@@ -176,9 +308,20 @@ function getDashAddress(WIF) {
     return dashcore.PrivateKey.fromWIF(WIF).toAddress().toString();
 }
 
-function execute() {
+function getCardanoAddress(seed, derivationPath) {
+  const derivpath = convertDerivationPathToArray(derivationPath);
+  const addressIndex = derivpath.pop();
+  const pathString = `m/${derivpath.join('/')}`
+  const xpubPair = getXpubPair(seed, pathString);
+  const xpubHash = xpubPair.xpub.toString('hex');
+  const hdPassphrase = cardanoCrypto.xpubToHdPassphrase(Buffer.from(xpubHash, 'hex'));
+  return cardanoCrypto.packAddress([addressIndex], Buffer.from(xpubHash, 'hex'), hdPassphrase, 2);
+}
+
+async function execute() {
   if (isValidMnemonicPhrase()) {
     setDerivationErrorState(false);
+    await loadSeed();
     generate();
   } else {
     setDerivationErrorState(true);
@@ -188,11 +331,10 @@ function execute() {
 function generate() {
     var seed = getSeed();
     NUM_WALLETS = $("#numWallets").val()*1;
-    console.log("NUM_WALLETS: " + NUM_WALLETS);
+    console.log(`NUM_WALLETS: ${ NUM_WALLETS }`);
     START_WALLET_INDEX = $("#startWalletIndex").val()*1;
-    console.log("START_WALLET_INDEX: " + START_WALLET_INDEX);
-    BLOCKCHAIN_TYPE = $("#blockchainType option:selected").val()*1;
-    console.log("BLOCKCHAIN_TYPE: " + BLOCKCHAIN_TYPE);
+    console.log(`START_WALLET_INDEX: ${ START_WALLET_INDEX }`);
+    console.log(`BLOCKCHAIN_TYPE: ${ BLOCKCHAIN_TYPE }`);
     var htmlInsertion = printWallets(seed);
     $("#walletInformation").html(htmlInsertion);
     $("#xPublicKey").html(getExtendedPublicKey(seed));
@@ -231,6 +373,9 @@ function registerEvents() {
       }
     });
   }
+  const btn = document.getElementById('deriveAddressBtn');
+  btn.addEventListener('click', execute);
+
 }
 
 function *mnemonicInputs() {
@@ -239,9 +384,24 @@ function *mnemonicInputs() {
   }
 }
 
+let seed;
+
+const loadSeed = async () => {
+  BLOCKCHAIN_TYPE = parseInt(document.getElementById('blockchainType').value, 10);
+  if (BLOCKCHAIN_TYPE === 1815) {
+    const mnemonicSecret = await cardanoCrypto.mnemonicToRootKeypair(getMnemonicPhrase(), 2);
+    seed = cardanoCrypto.cardanoMemoryCombine(mnemonicSecret, '');
+    seed = seed.toString('hex');
+    return;
+  }
+  seed = Bip39.mnemonicToSeedSync(getMnemonicPhrase(), '');
+};
+
+const getSeed = () => seed;
+
 const getMnemonicWords = () => Array.from(mnemonicInputs(), (input) => input.value.toLowerCase());
 const getMnemonicPhrase = () => getMnemonicWords().join(' ');
-const getSeed = () => Bip39.mnemonicToSeedSync(getMnemonicPhrase(), '');
+
 const isValidMnemonicPhrase = () => (getMnemonicWords().filter(w => w.trim() !== '').length === 24) &&
   Bip39.validateMnemonic(getMnemonicPhrase());
 const isValidBip39Word = (word) => Bip39.wordlists.english.includes(word.toLowerCase().trim());

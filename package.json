@@ -14,10 +14,10 @@
   "license": "ISC",
   "dependencies": {
     "@dashevo/dashcore-lib": "0.18.13",
-    "@emurgo/cardano-serialization-lib-asmjs": "^3.0.0",
     "bip39": "3.0.2",
     "bitcore-lib": "8.22.2",
     "browserify": "17.0.0",
+    "cardano-crypto.js": "github:derekbar90/cardano-crypto.js",
     "commander": "6.1.0",
     "ethereumjs-util": "7.0.7",
     "litecore": "4.1.10",
@@ -27,8 +27,6 @@
     "@babel/core": "^7.12.3",
     "@types/long": "4.0.1",
     "@types/node": "13.13.4",
-    "babelify": "^10.0.0",
-    "http-server": "0.12.3",
-    "typescript": "^2.8.1"
+    "http-server": "0.12.3"
   }
 }
