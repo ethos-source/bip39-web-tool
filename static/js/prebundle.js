@@ -12,23 +12,30 @@ const MNEMONIC_WORDCOUNT = 24;
 let NUM_WALLETS = 10;
 let START_WALLET_INDEX = 0;
 let BLOCKCHAIN_TYPE = 0;
+const CARDANO_EXTENDED_KEYPAIR_PATH = `m/244`;
 const EXTENDED_KEYPAIR_PATH = `m/244'`;
 
 // Extended Private Key
+function selectExtendedPath(blockchainId) {
+  if (blockchainId === 1815) return CARDANO_EXTENDED_KEYPAIR_PATH;
+  return EXTENDED_KEYPAIR_PATH;
+}
 // Returns string with extended private key
-function getExtendedPrivateKey(seed) {
-    const xKey = getKeyPair(seed, EXTENDED_KEYPAIR_PATH);
+function getExtendedPrivateKey(seed, blockchainId) {
+    const path = selectExtendedPath(blockchainId);
+    const xKey = getKeyPair(seed, path);
     const xPrivateKey = xKey.extendedPrivateKey;
-    var construction = `Extended Private Key (at ${EXTENDED_KEYPAIR_PATH}): ${xPrivateKey}`;
+    var construction = `Extended Private Key (at ${path}): ${xPrivateKey}`;
     return construction;
 }
 
 // Extended Public Key
 // Returns string with extended public key
-function getExtendedPublicKey(seed) {
-    const xKey = getKeyPair(seed, EXTENDED_KEYPAIR_PATH);
+function getExtendedPublicKey(seed, blockchainId) {
+    const path = selectExtendedPath(blockchainId);
+    const xKey = getKeyPair(seed, path);
     const xPublicKey = xKey.extendedPublicKey;
-    var construction = `Extended Public Key (at ${EXTENDED_KEYPAIR_PATH}): ${xPublicKey}`;
+    var construction = `Extended Public Key (at ${path}): ${xPublicKey}`;
     return construction;
 }
 
@@ -76,6 +83,7 @@ function getKeyPair(seed, derivationPath) {
 
 // constructs the derviation path
 function getDerivationPath(blockchainId, walletIndex) {
+    if (blockchainId === 1815) return `${CARDANO_EXTENDED_KEYPAIR_PATH}/0/${blockchainId}/${walletIndex}/0`;
     return `${EXTENDED_KEYPAIR_PATH}/0/${blockchainId}/${walletIndex}/0/0`;
 }
 
@@ -165,7 +173,7 @@ function printWalletDetails(seed, blockchainId, walletIndex) {
               walletIndex,
               path,
               publicKey,
-              privateKey,
+              privateKey: keyPair.extendedPrivateKey,
               address
           }
     }
@@ -309,13 +317,10 @@ function getDashAddress(WIF) {
 }
 
 function getCardanoAddress(seed, derivationPath) {
-  const derivpath = convertDerivationPathToArray(derivationPath);
-  const addressIndex = derivpath.pop();
-  const pathString = `m/${derivpath.join('/')}`
-  const xpubPair = getXpubPair(seed, pathString);
+  const xpubPair = getXpubPair(seed, derivationPath);
   const xpubHash = xpubPair.xpub.toString('hex');
   const hdPassphrase = cardanoCrypto.xpubToHdPassphrase(Buffer.from(xpubHash, 'hex'));
-  return cardanoCrypto.packAddress([addressIndex], Buffer.from(xpubHash, 'hex'), hdPassphrase, 2);
+  return cardanoCrypto.packAddress([], Buffer.from(xpubHash, 'hex'), hdPassphrase, 2);
 }
 
 async function execute() {
@@ -337,8 +342,8 @@ function generate() {
     console.log(`BLOCKCHAIN_TYPE: ${ BLOCKCHAIN_TYPE }`);
     var htmlInsertion = printWallets(seed);
     $("#walletInformation").html(htmlInsertion);
-    $("#xPublicKey").html(getExtendedPublicKey(seed));
-    $("#xPrivateKey").html(getExtendedPrivateKey(seed));
+    $("#xPublicKey").html(getExtendedPublicKey(seed, BLOCKCHAIN_TYPE));
+    $("#xPrivateKey").html(getExtendedPrivateKey(seed, BLOCKCHAIN_TYPE));
 }
 
 function setDerivationErrorState(isError) {
