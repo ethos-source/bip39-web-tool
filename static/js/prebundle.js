@@ -298,9 +298,8 @@ function convertDerivationPathToArray(bip32Path) {
 function getEthAddress(privateKey) {
     const privKeyBuffer = ethUtil.toBuffer(ethUtil.addHexPrefix(privateKey));
     const addressBuffer = ethUtil.privateToAddress(privKeyBuffer);
-    const hexAddress = addressBuffer.toString('hex');
-    const checksumAddress = ethUtil.toChecksumAddress(hexAddress);
-    return ethUtil.addHexPrefix(checksumAddress);
+    const hexAddress = ethUtil.addHexPrefix(addressBuffer.toString('hex'));
+    return ethUtil.toChecksumAddress(hexAddress);
 }
 
 // gets the btc address using the private key
