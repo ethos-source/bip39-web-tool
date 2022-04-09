@@ -15,7 +15,9 @@
   "dependencies": {
     "@dashevo/dashcore-lib": "0.18.13",
     "bip39": "3.0.2",
+    "bitcore-lib-cash": "8.6.0",
     "bitcore-lib": "8.22.2",
+    "bitcoinjs-lib": "3.3.2",
     "browserify": "17.0.0",
     "cardano-crypto.js": "github:derekbar90/cardano-crypto.js",
     "commander": "6.1.0",

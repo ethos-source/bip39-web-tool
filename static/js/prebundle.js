@@ -3,8 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Bip39 = require("bip39");
 const ethUtil = require("ethereumjs-util");
 const bitcore_lib = require("bitcore-lib");
-const litecore = require('litecore');
+const bitcoinjs_lib = require("bitcoinjs-lib");
+const litecore = require('litecore-lib');
 const dashcore = require('@dashevo/dashcore-lib');
+const bitcoin_cash_lib = require('bitcore-lib-cash');
 const cardanoCrypto = require('cardano-crypto.js');
 
 const ENGLISH_WORDLIST = Bip39.wordlists.EN;
@@ -165,6 +167,28 @@ function printWalletDetails(seed, blockchainId, walletIndex) {
                 privateKey,
                 address
             }
+        case 61:
+          // Ethereum Classic Logic
+              var address = getEthAddress(keyPair.privateKey);
+              console.log(`Address: ${address}`);
+              return {
+                  walletIndex,
+                  path,
+                  publicKey,
+                  privateKey,
+                  address
+              }
+        case 145:
+          // Bitcoin Cash logic
+              var address = getBchAddress(keyPair.exportedWIF);
+              console.log(`Address: ${address}`);
+              return {
+                  walletIndex,
+                  path,
+                  publicKey,
+                  privateKey,
+                  address
+              }
         case 1815:
         // Cardano
             var address = getCardanoAddress(seed, path);
@@ -294,7 +318,7 @@ function convertDerivationPathToArray(bip32Path) {
   return path;
 }
 
-// gets the eth address using the private key
+// gets the eth or etc address using the private key
 function getEthAddress(privateKey) {
     const privKeyBuffer = ethUtil.toBuffer(ethUtil.addHexPrefix(privateKey));
     const addressBuffer = ethUtil.privateToAddress(privKeyBuffer);
@@ -313,6 +337,15 @@ function getLtcAddress(WIF) {
 // gets the dash address using the private key
 function getDashAddress(WIF) {
     return dashcore.PrivateKey.fromWIF(WIF).toAddress().toString();
+}
+
+// gets the bch address using the private key
+function getBchAddress(WIF) {
+  const { address, crypto } = bitcoinjs_lib;
+  return address.toBase58Check( 
+    crypto.hash160(bitcoin_cash_lib.PrivateKey.fromWIF(WIF).toBuffer()),
+    0x00, /* BCH mainnet prefix */
+  );
 }
 
 function getCardanoAddress(seed, derivationPath) {
